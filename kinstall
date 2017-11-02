@@ -1,0 +1,24 @@
+#!/bin/bash
+# Check if running as root, if no - exit
+if [ "$EUID" -ne 0 ]; then
+  echo "Please run as root"
+  exit
+fi
+# Check if first argument is rebuild, if yes rebuild kext cache without copying anything
+if [ $1 = "rebuild" ]; then
+  echo "Rebuilding kext cache, please wait..."
+  sudo touch /System/Library/Extensions
+  sudo kextcache -u /
+# If first argument is not rebuild, copy first argument (assuming it's a file path) to /System/Library/Extensions, fix permissions / ownership and rebuild cache
+else
+  echo "Copying kext..."
+  sudo cp $1 /System/Library/Extensions
+  echo "Fixing permissions..."
+  sudo chmod 755 /System/Library/Extensions/$1
+  echo "Fixing ownership..."
+  sudo chown root:wheel /System/Library/Extensions/$1
+  echo "Rebuilding kext cache..."
+  sudo touch /System/Library/Extensions
+  sudo kextcache -u /
+  echo "Done! Thanks for using kinstall.sh! :D"
+fi
