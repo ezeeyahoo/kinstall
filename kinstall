@@ -4,6 +4,13 @@ if [ "$EUID" -ne 0 ]; then
   echo "Please run as root"
   exit
 fi
+
+# If macOS is Catalina then mount the root partition
+if [ -n "$(sw_vers | fgrep 'ProductVersion:	10.15')" ]
+then
+  sudo mount -uw /
+fi
+
 # Check if first argument is rebuild, if yes rebuild kext cache without copying anything
 if [ $1 = "rebuild" ]; then
   echo "Rebuilding kext cache, please wait..."
